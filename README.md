@@ -27,6 +27,19 @@ This Node.js terminal application updates multiple local git repositories by pul
    ```
    The app will prompt you to select which config file to use from the `Repos` folder each time it runs.
 
+## Global Installation
+You can install this app globally to use the CLI command anywhere:
+
+1. In your project directory, run:
+   ```sh
+   npm install -g .
+   ```
+2. Now you can run the updater from any directory with:
+   ```sh
+   repoupdater
+   ```
+   The app will prompt you to select a config file from the `Repos` folder in your current directory. Make sure to run the command from the directory containing your `Repos` folder and config files, or use absolute paths in your config files if running elsewhere.
+
 ## Usage
 1. Create a JSON config file with your repositories and save it in the `Repos` folder, e.g.:
    ```json
