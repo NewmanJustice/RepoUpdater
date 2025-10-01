@@ -1,0 +1,12 @@
+[
+  {
+    "folder": "/path/to/local/repo1",
+    "remoteUrl": "git@github.com:user/repo1.git",
+    "branch": "main"
+  },
+  {
+    "folder": "/path/to/local/repo2",
+    "remoteUrl": "https://github.com/user/repo2.git",
+    "branch": "master"
+  }
+]

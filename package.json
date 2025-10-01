@@ -1,0 +1,15 @@
+{
+  "name": "repoupdater",
+  "version": "1.0.0",
+  "description": "Node.js terminal app to update multiple local git repositories from their remotes.",
+  "main": "update-repos.js",
+  "bin": {
+    "repoupdater": "./update-repos.js"
+  },
+  "scripts": {
+    "start": "node update-repos.js"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {}
+}
