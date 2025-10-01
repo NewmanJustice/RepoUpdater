@@ -3,9 +3,7 @@
 const fs = require('fs');
 const path = require('path');
 const readline = require('readline');
-const { execSync, exec } = require('child_process');
-
-const CONFIG_FILE = 'repos.json';
+const { execSync } = require('child_process');
 
 function prompt(question) {
   const rl = readline.createInterface({
@@ -16,6 +14,31 @@ function prompt(question) {
     rl.close();
     resolve(ans);
   }));
+}
+
+async function selectConfigFile() {
+  const reposDir = path.join(__dirname, 'Repos');
+  if (!fs.existsSync(reposDir)) {
+    console.error(`Repos directory not found: ${reposDir}`);
+    process.exit(1);
+  }
+  const files = fs.readdirSync(reposDir).filter(f => f.endsWith('.json'));
+  if (files.length === 0) {
+    console.error('No JSON config files found in the Repos directory.');
+    process.exit(1);
+  }
+  console.log('Select a config file:');
+  files.forEach((file, idx) => {
+    console.log(`${idx + 1}. ${file}`);
+  });
+  let selectedIdx;
+  while (true) {
+    const answer = await prompt('Enter the number of the config file to use: ');
+    selectedIdx = parseInt(answer, 10) - 1;
+    if (!isNaN(selectedIdx) && selectedIdx >= 0 && selectedIdx < files.length) break;
+    console.log('Invalid selection. Please try again.');
+  }
+  return path.join(reposDir, files[selectedIdx]);
 }
 
 async function updateRepo(repo) {
@@ -47,7 +70,7 @@ async function updateRepo(repo) {
 }
 
 async function main() {
-  let configPath = path.join(__dirname, CONFIG_FILE);
+  const configPath = await selectConfigFile();
   if (!fs.existsSync(configPath)) {
     console.error(`Config file not found: ${configPath}`);
     process.exit(1);

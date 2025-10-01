@@ -20,14 +20,15 @@ This Node.js terminal application updates multiple local git repositories by pul
 
 ## Getting Started
 1. Clone or download this repository to your local machine.
-2. Create or edit the `repos.json` file with your repository details (see below).
+2. Create one or more JSON config files with your repository details and place them in the `Repos` folder (see below for format).
 3. Run the updater with:
    ```sh
    node update-repos.js
    ```
+   The app will prompt you to select which config file to use from the `Repos` folder each time it runs.
 
 ## Usage
-1. Create a JSON config file with your repositories, e.g.:
+1. Create a JSON config file with your repositories and save it in the `Repos` folder, e.g.:
    ```json
    [
      {
@@ -42,8 +43,9 @@ This Node.js terminal application updates multiple local git repositories by pul
      }
    ]
    ```
-2. Run the app in your terminal. It will prompt for authentication if needed and update each repository as configured.
-3. At the end, a summary of errors (if any) and a completion message will be displayed.
+2. When you run the app, it will list all `.json` files in the `Repos` folder and prompt you to select one.
+3. The app will prompt for authentication if needed and update each repository as configured.
+4. At the end, a summary of errors (if any) and a completion message will be displayed.
 
 ## Notes
 - The app will overwrite local changes by hard resetting to the remote branch.
