@@ -60,6 +60,24 @@ You can install this app globally to use the CLI command anywhere:
 3. The app will prompt for authentication if needed and update each repository as configured.
 4. At the end, a summary of errors (if any) and a completion message will be displayed.
 
+## Example: Multiple Repositories for a Service
+You can add multiple repositories to a single config file to build or update an overall service. Each object in the array represents a local repository to update from its remote. For example:
+
+```json
+[
+  {
+    "folder": "/path/to/local/repo1",
+    "remoteUrl": "git@github.com:user/repo1.git",
+    "branch": "main"
+  },
+  {
+    "folder": "/path/to/local/repo2",
+    "remoteUrl": "https://github.com/user/repo2.git",
+    "branch": "master"
+  }
+]
+```
+
 ## Notes
 - The app will overwrite local changes by hard resetting to the remote branch.
 - Ensure you have the necessary permissions and credentials for private repositories.
