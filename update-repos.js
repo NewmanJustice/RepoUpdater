@@ -41,7 +41,44 @@ async function selectConfigFile() {
   return path.join(reposDir, files[selectedIdx]);
 }
 
-async function updateRepo(repo) {
+function isBinaryFile(filename) {
+  const binaryExtensions = [
+    '.png', '.jpg', '.jpeg', '.gif', '.bmp', '.ico', '.exe', '.dll', '.so', '.bin', '.pdf', '.zip', '.tar', '.gz', '.7z', '.mp3', '.mp4', '.mov', '.avi', '.ogg', '.wav', '.class', '.jar', '.pyc', '.pyo', '.node'
+  ];
+  return binaryExtensions.some(ext => filename.toLowerCase().endsWith(ext));
+}
+
+function flattenRepoToTxt(repoFolder, repoName) {
+  const flatDir = path.join(__dirname, 'flatrepos');
+  if (!fs.existsSync(flatDir)) fs.mkdirSync(flatDir);
+  const today = new Date().toISOString().slice(0, 10);
+  const outFile = path.join(flatDir, `${today}-${repoName}.txt`);
+  let output = '';
+  function walk(dir) {
+    const entries = fs.readdirSync(dir, { withFileTypes: true });
+    for (const entry of entries) {
+      const fullPath = path.join(dir, entry.name);
+      const relPath = path.relative(repoFolder, fullPath);
+      if (entry.isDirectory()) {
+        if (["node_modules", ".git", "flatrepos"].includes(entry.name)) continue;
+        walk(fullPath);
+      } else if (!isBinaryFile(entry.name)) {
+        try {
+          const content = fs.readFileSync(fullPath, 'utf8');
+          output += `\n--- ${relPath} ---\n`;
+          output += content + '\n';
+        } catch (e) {
+          // skip unreadable files
+        }
+      }
+    }
+  }
+  walk(repoFolder);
+  fs.writeFileSync(outFile, output, 'utf8');
+  console.log(`Flattened repo to ${outFile}`);
+}
+
+async function updateRepo(repo, flatten) {
   const { folder, remoteUrl, branch } = repo;
   let error = null;
   try {
@@ -62,6 +99,11 @@ async function updateRepo(repo) {
     execSync(`git fetch origin ${branch}`);
     execSync(`git reset --hard origin/${branch}`);
     console.log(`Updated ${folder} to match ${remoteUrl} (${branch})`);
+    // Flatten repo after update if requested
+    if (flatten) {
+      const repoName = path.basename(folder.replace(/\/$/, ''));
+      flattenRepoToTxt(folder, repoName);
+    }
   } catch (err) {
     error = err.message;
     console.error(`Error updating ${folder}: ${error}`);
@@ -76,10 +118,12 @@ async function main() {
     process.exit(1);
   }
   const repos = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+  const flattenAnswer = await prompt('Do you want to generate flattened txt files for each repo? (y/n): ');
+  const flatten = flattenAnswer.trim().toLowerCase() === 'y';
   const results = [];
   for (const repo of repos) {
     // eslint-disable-next-line no-await-in-loop
-    results.push(await updateRepo(repo));
+    results.push(await updateRepo(repo, flatten));
   }
   const errors = results.filter(r => r.error);
   if (errors.length) {
